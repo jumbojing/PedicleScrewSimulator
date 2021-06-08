@@ -91,12 +91,12 @@ class PedicleScrewSimulatorWidget(ScriptedLoadableModuleWidget):
     nNodes = slicer.mrmlScene.GetNumberOfNodesByClass('vtkMRMLScriptedModuleNode')
 
     self.parameterNode = None
-    for n in range(nNodes):
+    for n in xrange(nNodes):
       compNode = slicer.mrmlScene.GetNthNodeByClass(n, 'vtkMRMLScriptedModuleNode')
       nodeid = None
       if compNode.GetModuleName() == 'PedicleScrewSimulator':
         self.parameterNode = compNode
-        logging.debug('Found existing PedicleScrewSimulator parameter node')
+        print 'Found existing PedicleScrewSimulator parameter node'
         break
     if self.parameterNode == None:
       self.parameterNode = slicer.vtkMRMLScriptedModuleNode()
@@ -111,7 +111,7 @@ class PedicleScrewSimulatorWidget(ScriptedLoadableModuleWidget):
     currentStep = self.parameterNode.GetParameter('currentStep')
     
     if currentStep != '':
-      logging.debug('Restoring workflow step to ' + currentStep)
+      print 'Restoring workflow step to ', currentStep
       if currentStep == 'LoadData':
         self.workflow.setInitialStep(self.loadDataStep)
       if currentStep == 'DefineROI':
@@ -127,7 +127,7 @@ class PedicleScrewSimulatorWidget(ScriptedLoadableModuleWidget):
       if currentStep == 'Final':
         self.workflow.setInitialStep(self.endStep)
     else:
-      logging.debug('currentStep in parameter node is empty')
+      print 'currentStep in parameter node is empty!'
     
     
     # start the workflow and show the widget
@@ -197,4 +197,26 @@ class PedicleScrewSimulatorTest(ScriptedLoadableModuleTest):
     your test should break so they know that the feature is needed.
     """
 
-    self.delayDisplay('No test is implemented.')
+    self.delayDisplay("Starting the test")
+    #
+    # first, get some data
+    #
+    import urllib
+    downloads = (
+        ('http://slicer.kitware.com/midas3/download?items=5767', 'FA.nrrd', slicer.util.loadVolume),
+        )
+
+    for url,name,loader in downloads:
+      filePath = slicer.app.temporaryPath + '/' + name
+      if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
+        logging.info('Requesting download %s from %s...\n' % (name, url))
+        urllib.urlretrieve(url, filePath)
+      if loader:
+        logging.info('Loading %s...' % (name,))
+        loader(filePath)
+    self.delayDisplay('Finished with download and loading')
+
+    volumeNode = slicer.util.getNode(pattern="FA")
+    logic = PedicleScrewSimulatorLogic()
+    self.assertIsNotNone( logic.hasImageData(volumeNode) )
+    self.delayDisplay('Test passed!')

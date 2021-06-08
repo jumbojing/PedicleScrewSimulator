@@ -1,4 +1,3 @@
-import logging
 from __main__ import qt, ctk, slicer
 
 class PedicleScrewSimulatorStep( ctk.ctkWorkflowWidgetStep ) :
@@ -43,7 +42,7 @@ class PedicleScrewSimulatorStep( ctk.ctkWorkflowWidgetStep ) :
   def onEntry( self, comingFrom, transitionType ):
     comingFromId = "None"
     if comingFrom: comingFromId = comingFrom.id()
-    logging.debug("-> onEntry - current [%s] - comingFrom [%s]" % ( self.id(), comingFromId ))
+    print "-> onEntry - current [%s] - comingFrom [%s]" % ( self.id(), comingFromId )
     super( PedicleScrewSimulatorStep, self ).onEntry( comingFrom, transitionType )
 
   def onExit( self, goingTo, transitionType ):
@@ -51,12 +50,12 @@ class PedicleScrewSimulatorStep( ctk.ctkWorkflowWidgetStep ) :
 
     if goingTo: goingToId = goingTo.id()
     
-    logging.debug("-> onExit - current [%s] - goingTo [%s]" % ( self.id(), goingToId ))
+    print "-> onExit - current [%s] - goingTo [%s]" % ( self.id(), goingToId )
     super( PedicleScrewSimulatorStep, self ).onExit( goingTo, transitionType )
 
   def validate( self, desiredBranchId ):
     return
-    logging.debug("-> validate %s" % self.id())
+    print "-> validate %s" % self.id()
 
   def validationSucceeded( self, desiredBranchId ):
     '''

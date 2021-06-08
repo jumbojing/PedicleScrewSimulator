@@ -2,7 +2,6 @@
 from __main__ import vtk, slicer
 
 # python includes
-import logging
 import sys
 import time
 
@@ -14,34 +13,34 @@ class Helper( object ):
   @staticmethod
   def Info( message ):
     '''
-
+    
     '''
 
-    #logging.debug("[PedicleScrewSimulatorPy " + time.strftime( "%m/%d/%Y %H:%M:%S" ) + "]: " + str( message ))
+    #print "[PedicleScrewSimulatorPy " + time.strftime( "%m/%d/%Y %H:%M:%S" ) + "]: " + str( message )
     #sys.stdout.flush()
 
   @staticmethod
   def Warning( message ):
     '''
-
+    
     '''
 
-    #logging.debug("[PedicleScrewSimulatorPy " + time.strftime( "%m/%d/%Y %H:%M:%S" ) + "]: WARNING: " + str( message ))
+    #print "[PedicleScrewSimulatorPy " + time.strftime( "%m/%d/%Y %H:%M:%S" ) + "]: WARNING: " + str( message )
     #sys.stdout.flush()
 
   @staticmethod
   def Error( message ):
     '''
-
+    
     '''
 
-    logging.debug("[PedicleScrewSimulatorPy " + time.strftime( "%m/%d/%Y %H:%M:%S" ) + "]: ERROR: " + str( message ))
+    print "[PedicleScrewSimulatorPy " + time.strftime( "%m/%d/%Y %H:%M:%S" ) + "]: ERROR: " + str( message )
     sys.stdout.flush()
 
   @staticmethod
   def ErrorPopup( message ):
     '''
-
+    
     '''
     messageBox = qt.QMessageBox()
     messageBox.critical(None,'',message)
@@ -49,13 +48,13 @@ class Helper( object ):
   @staticmethod
   def Debug( message ):
     '''
-
+    
     '''
 
     showDebugOutput = 0
     from time import strftime
     if showDebugOutput:
-        logging.debug("[PedicleScrewSimulatorPy " + time.strftime( "%m/%d/%Y %H:%M:%S" ) + "] DEBUG: " + str( message ))
+        print "[PedicleScrewSimulatorPy " + time.strftime( "%m/%d/%Y %H:%M:%S" ) + "] DEBUG: " + str( message )
         sys.stdout.flush()
 
   @staticmethod
@@ -79,7 +78,7 @@ class Helper( object ):
              'Measurements', #3
              'Landmarks', #4
              'Final', #5
-             ]
+             ]                        
 
     if n < 0 or n > len( steps ):
       n = 0
@@ -101,6 +100,28 @@ class Helper( object ):
     appLogic.PropagateVolumeSelection()
 
   @staticmethod
+  def InitVRDisplayNode(vrDisplayNode, volumeID, roiID):
+    vrLogic = slicer.modules.volumerendering.logic()
+
+    print('PedicleScrewSimulator VR: will observe ID '+volumeID)
+    propNode = vrDisplayNode.GetVolumePropertyNode()
+
+    if propNode == None:
+      propNode = slicer.vtkMRMLVolumePropertyNode()
+      slicer.mrmlScene.AddNode(propNode)
+    else:
+      print('Property node: '+propNode.GetID())
+
+    vrDisplayNode.SetAndObserveVolumePropertyNodeID(propNode.GetID())
+
+    vrDisplayNode.SetAndObserveROINodeID(roiID)
+
+    vrDisplayNode.SetAndObserveVolumeNodeID(volumeID)
+
+    vrLogic.CopyDisplayToVolumeRenderingDisplayNode(vrDisplayNode)
+
+
+  @staticmethod
   def findChildren(widget=None,name="",text=""):
     """ return a list of child widgets that match the passed name """
     # TODO: figure out why the native QWidget.findChildren method
@@ -114,7 +135,7 @@ class Helper( object ):
       parents += p.children()
       if name and p.name.find(name)>=0:
         children.append(p)
-      elif text:
+      elif text: 
         try:
           p.text
           if p.text.find(text)>=0:
