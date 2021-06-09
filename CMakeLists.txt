@@ -21,6 +21,7 @@ include(${Slicer_USE_FILE})
 # Extension modules
 add_subdirectory(PedicleScrewSimulator)
 add_subdirectory(PedicleScrewPlanner)
+add_subdirectory(pediclescrew)
 ## NEXT_MODULE
 
 #-----------------------------------------------------------------------------
