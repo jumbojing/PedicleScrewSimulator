@@ -23,6 +23,8 @@ The author mainly made improvements to [LandmarksStep.py](https://github.com/las
 
 作者主要是针对这个项目的[LandmarksStep.py](https://github.com/lassoan/PedicleScrewSimulator/blob/master/PedicleScrewSimulator/PedicleScrewSimulatorWizard/LandmarksStep.py) 进行了改进,我们提出了**the Pedicle Tirangle**的概念,它是指同一椎体的三个点:即椎前点和左右最窄点,所形成的三角形.如下图所示:椎前点是指椎体前中点,椎弓根最窄点则是以椎管最大横径为冠状面,在该平面两侧椎弓根的中点.取得这三个点以后,插件通过分别连接椎前点和左右最窄点,形成椎弓根的轴线.同时插件还设计了椎弓根螺钉长度和半径的初步估算.
 
+
+
 PedicleScrewSimulator
 =====================
 
