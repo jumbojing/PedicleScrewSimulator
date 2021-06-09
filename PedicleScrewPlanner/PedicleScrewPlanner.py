@@ -5,36 +5,39 @@ from slicer.ScriptedLoadableModule import *
 import logging
 
 import PedicleScrewSimulatorWizard
+import PedicleScrewPlannerWizard
+#from PedicleScrewPlannerWizard import *
 
 #
-# PedicleScrewSimulator
+# PedicleScrewPlanner
 #
 
-class PedicleScrewSimulator(ScriptedLoadableModule):
+class PedicleScrewPlanner(ScriptedLoadableModule):
   """Uses ScriptedLoadableModule base class, available at:
   https://github.com/Slicer/Slicer/blob/master/Base/Python/slicer/ScriptedLoadableModule.py
   """
 
   def __init__(self, parent):
     ScriptedLoadableModule.__init__(self, parent)
-    self.parent.title = "Pedicle Screw Simulator"
+    self.parent.title = "Pedicle Screw Planner"
     self.parent.categories = ["Training"]
     self.parent.dependencies = []
     self.parent.contributors = ["Brendan Polley (University of Toronto)",
       "Stewart McLachlin (Sunnybrook Research Institute)",
-      "Cari Whyne (Sunnybrook Research Institute)"]
+      "Cari Whyne (Sunnybrook Research Institute)",
+      "Jumbo Jing"]
     self.parent.helpText = """
-Pedicle Screw Simulator. See more details here: https://github.com/smclach/PedicleScrewSimulator
+Pedicle Screw Simulator. See more details here: https://github.com/lassoan/PedicleScrewSimulator
 """
     self.parent.acknowledgementText = """
 Orthopaedic Biomechanics Laboratory, Sunnybrook Health Sciences Centre.
 """ # replace with organization, grant and thanks.
 
 #
-# PedicleScrewSimulatorWidget
+# PedicleScrewPlannerWidget
 #
 
-class PedicleScrewSimulatorWidget(ScriptedLoadableModuleWidget):
+class PedicleScrewPlannerWidget(ScriptedLoadableModuleWidget):
   """Uses ScriptedLoadableModuleWidget base class, available at:
   https://github.com/Slicer/Slicer/blob/master/Base/Python/slicer/ScriptedLoadableModule.py
   """
@@ -51,11 +54,11 @@ class PedicleScrewSimulatorWidget(ScriptedLoadableModuleWidget):
 
     # create all wizard steps
     self.loadDataStep = PedicleScrewSimulatorWizard.LoadDataStep( 'LoadData'  )
-    self.defineROIStep = PedicleScrewSimulatorWizard.DefineROIStep( 'DefineROI', showSidesSelector=False )
-    self.measurementsStep = PedicleScrewSimulatorWizard.MeasurementsStep( 'Measurements'  )
-    self.landmarksStep = PedicleScrewSimulatorWizard.LandmarksStep( 'Landmarks' )
-    self.screwStep = PedicleScrewSimulatorWizard.ScrewStep( 'Screw' )
-    self.gradeStep = PedicleScrewSimulatorWizard.GradeStep( 'Grade' )
+    self.defineROIStep = PedicleScrewSimulatorWizard.DefineROIStep( 'DefineROI', showSidesSelector=True )
+    self.measurementsStep = PedicleScrewPlannerWizard.PlanningMeasurementsStep( 'Measurements'  )
+    self.landmarksStep = PedicleScrewPlannerWizard.PlanningLandmarksStep( 'Landmarks' )
+    # self.screwStep = PedicleScrewSimulatorWizard.ScrewStep( 'Screw' )
+    self.gradeStep = PedicleScrewPlannerWizard.PlanningGradeStep( 'Grade' )
     self.endStep = PedicleScrewSimulatorWizard.EndStep( 'Final'  )
     
     # add the wizard steps to an array for convenience
@@ -65,7 +68,7 @@ class PedicleScrewSimulatorWidget(ScriptedLoadableModuleWidget):
     allSteps.append( self.defineROIStep )
     allSteps.append( self.landmarksStep)
     allSteps.append( self.measurementsStep )
-    allSteps.append( self.screwStep)
+    # allSteps.append( self.screwStep)
     allSteps.append( self.gradeStep)
     allSteps.append( self.endStep )
     
@@ -80,12 +83,14 @@ class PedicleScrewSimulatorWidget(ScriptedLoadableModuleWidget):
     self.workflow.addTransition( self.landmarksStep, self.measurementsStep, 'pass', ctk.ctkWorkflow.Bidirectional )
     self.workflow.addTransition( self.landmarksStep, self.measurementsStep, 'fail', ctk.ctkWorkflow.Bidirectional )
     
-    self.workflow.addTransition( self.measurementsStep, self.screwStep, 'pass', ctk.ctkWorkflow.Bidirectional )
-    self.workflow.addTransition( self.measurementsStep, self.screwStep, 'fail', ctk.ctkWorkflow.Bidirectional )
-    
-    self.workflow.addTransition( self.screwStep, self.gradeStep, 'pass', ctk.ctkWorkflow.Bidirectional )
-    self.workflow.addTransition( self.screwStep, self.gradeStep, 'fail', ctk.ctkWorkflow.Bidirectional )
-          
+    # self.workflow.addTransition( self.measurementsStep, self.screwStep, 'pass', ctk.ctkWorkflow.Bidirectional )
+    # self.workflow.addTransition( self.measurementsStep, self.screwStep, 'fail', ctk.ctkWorkflow.Bidirectional )
+    #
+    # self.workflow.addTransition( self.screwStep, self.gradeStep, 'pass', ctk.ctkWorkflow.Bidirectional )
+    # self.workflow.addTransition( self.screwStep, self.gradeStep, 'fail', ctk.ctkWorkflow.Bidirectional )
+    self.workflow.addTransition( self.measurementsStep, self.gradeStep, 'pass', ctk.ctkWorkflow.Bidirectional )
+    self.workflow.addTransition( self.measurementsStep, self.gradeStep, 'fail', ctk.ctkWorkflow.Bidirectional )
+
     self.workflow.addTransition( self.gradeStep, self.endStep )
            
     nNodes = slicer.mrmlScene.GetNumberOfNodesByClass('vtkMRMLScriptedModuleNode')
@@ -94,13 +99,13 @@ class PedicleScrewSimulatorWidget(ScriptedLoadableModuleWidget):
     for n in range(nNodes):
       compNode = slicer.mrmlScene.GetNthNodeByClass(n, 'vtkMRMLScriptedModuleNode')
       nodeid = None
-      if compNode.GetModuleName() == 'PedicleScrewSimulator':
+      if compNode.GetModuleName() == 'PedicleScrewPlanner':
         self.parameterNode = compNode
-        logging.debug('Found existing PedicleScrewSimulator parameter node')
+        logging.debug('Found existing PedicleScrewPlanner parameter node')
         break
     if self.parameterNode == None:
       self.parameterNode = slicer.vtkMRMLScriptedModuleNode()
-      self.parameterNode.SetModuleName('PedicleScrewSimulator')
+      self.parameterNode.SetModuleName('PedicleScrewPlanner')
       slicer.mrmlScene.AddNode(self.parameterNode)
  
     for s in allSteps:
@@ -120,8 +125,8 @@ class PedicleScrewSimulatorWidget(ScriptedLoadableModuleWidget):
         self.workflow.setInitialStep(self.measurementsStep)
       if currentStep == 'Landmarks':
         self.workflow.setInitialStep(self.landmarksStep)
-      if currentStep == 'Screw':
-        self.workflow.setInitialStep(self.screwStep) 
+      # if currentStep == 'Screw':
+      #   self.workflow.setInitialStep(self.screwStep)
       if currentStep == 'Grade':
         self.workflow.setInitialStep(self.gradeStep)   
       if currentStep == 'Final':
@@ -142,7 +147,7 @@ class PedicleScrewSimulatorWidget(ScriptedLoadableModuleWidget):
     pass
 
   def onReload(self):
-    logging.debug("Reloading PedicleScrewSimulator")
+    logging.debug("Reloading PedicleScrewPlanner")
 
     packageName='PedicleScrewSimulatorWizard'
     submoduleNames=['PedicleScrewSimulatorStep',
@@ -152,8 +157,7 @@ class PedicleScrewSimulatorWidget(ScriptedLoadableModuleWidget):
       'Helper',
       'LandmarksStep',
       'LoadDataStep',
-      'MeasurementsStep',
-      'ScrewStep']
+      'MeasurementsStep']
 
     import imp
     f, filename, description = imp.find_module(packageName)
@@ -167,7 +171,7 @@ class PedicleScrewSimulatorWidget(ScriptedLoadableModuleWidget):
           
     ScriptedLoadableModuleWidget.onReload(self)
 
-class PedicleScrewSimulatorTest(ScriptedLoadableModuleTest):
+class PedicleScrewPlannerTest(ScriptedLoadableModuleTest):
   """
   This is the test case for your scripted module.
   Uses ScriptedLoadableModuleTest base class, available at:
@@ -183,9 +187,9 @@ class PedicleScrewSimulatorTest(ScriptedLoadableModuleTest):
     """Run as few or as many tests as needed here.
     """
     self.setUp()
-    self.test_PedicleScrewSimulator1()
+    self.test_PedicleScrewPlanner1()
 
-  def test_PedicleScrewSimulator1(self):
+  def test_PedicleScrewPlanner1(self):
     """ Ideally you should have several levels of tests.  At the lowest level
     tests should exercise the functionality of the logic with different inputs
     (both valid and invalid).  At higher levels your tests should emulate the

@@ -6,7 +6,8 @@ import PythonQt
 
 class DefineROIStep( PedicleScrewSimulatorStep ) :
 
-  def __init__( self, stepid ):
+  def __init__( self, stepid, showSidesSelector ):
+    self.showSidesSelector = showSidesSelector
     self.initialize( stepid )
     self.setName( '2. Define Surgical Region of Interest (ROI)' )
     self.setDescription( """Steps:\n  1. Define ROI (click and drag dotted colour box)\n  2. Select starting vertebrae and # to instrument""" )
@@ -60,16 +61,46 @@ class DefineROIStep( PedicleScrewSimulatorStep ) :
     #self.__layout.addWidget(self.iSelector)
 
     self.vertebraeGridBox = qt.QGridLayout()
-    self.vertebraeGridBox.addWidget(vText,0,0)
-    self.vertebraeGridBox.addWidget(self.vSelector,1,0)
-    self.vertebraeGridBox.addWidget(blank,0,1)
-    self.vertebraeGridBox.addWidget(iText,0,2)
-    self.vertebraeGridBox.addWidget(blank,1,1)
-    self.vertebraeGridBox.addWidget(self.iSelector,1,2)
-    self.vertebraeGridBox.addWidget(blank,0,3)
-    self.vertebraeGridBox.addWidget(aText,0,4)
-    self.vertebraeGridBox.addWidget(blank,1,3)
-    self.vertebraeGridBox.addWidget(self.aSelector,1,4)
+
+
+    if self.showSidesSelector:
+
+      sText = qt.QLabel("# Sides:")
+      self.sSelector = qt.QComboBox()
+      self.sSelector.setMaximumWidth(120)
+      self.sides = ("L&R", "Left", "Right", "--")
+      self.sSelector.addItems(self.sides)
+
+      self.vertebraeGridBox.addWidget(vText,0,0)
+      self.vertebraeGridBox.addWidget(blank,0,1)
+      self.vertebraeGridBox.addWidget(sText,0,2)
+      self.vertebraeGridBox.addWidget(blank,0,3)
+      self.vertebraeGridBox.addWidget(iText,0,4)
+      self.vertebraeGridBox.addWidget(blank,0,5)
+      self.vertebraeGridBox.addWidget(aText,0,6)
+
+      self.vertebraeGridBox.addWidget(self.vSelector,1,0)
+      self.vertebraeGridBox.addWidget(blank,1,1)
+      self.vertebraeGridBox.addWidget(self.sSelector,1,2)
+      self.vertebraeGridBox.addWidget(blank,1,3)
+      self.vertebraeGridBox.addWidget(self.iSelector,1,4)
+      self.vertebraeGridBox.addWidget(blank,1,5)
+      self.vertebraeGridBox.addWidget(self.aSelector,1,6)
+
+    else:
+
+      self.vertebraeGridBox.addWidget(vText,0,0)
+      self.vertebraeGridBox.addWidget(blank,0,1)
+      self.vertebraeGridBox.addWidget(iText,0,2)
+      self.vertebraeGridBox.addWidget(blank,0,3)
+      self.vertebraeGridBox.addWidget(aText,0,4)
+
+      self.vertebraeGridBox.addWidget(self.vSelector,1,0)
+      self.vertebraeGridBox.addWidget(blank,1,1)
+      self.vertebraeGridBox.addWidget(self.iSelector,1,2)
+      self.vertebraeGridBox.addWidget(blank,1,3)
+      self.vertebraeGridBox.addWidget(self.aSelector,1,4)
+
     self.__layout.addRow(self.vertebraeGridBox)
 
     #self.__layout.addRow("Starting Instrumented Vertebra:",self.vSelector)
@@ -488,6 +519,8 @@ class DefineROIStep( PedicleScrewSimulatorStep ) :
     pNode = self.parameterNode()
 
     pNode.SetParameter('vertebra', self.vSelector.currentText)
+    if self.showSidesSelector:
+      pNode.SetParameter('sides', self.sSelector.currentText)
     pNode.SetParameter('inst_length', self.iSelector.currentText)
     pNode.SetParameter('approach', self.aSelector.currentText)
 
