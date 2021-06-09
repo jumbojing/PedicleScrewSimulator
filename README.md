@@ -1,6 +1,8 @@
 PedicleScrewPlanner
 =====================
 
+> A new concise and unified imaging solution for percutaneous pedicle puncture.
+
 ## About the Pedicle Tirangle
 
 The author mainly made improvements to [LandmarksStep.py](https://github.com/lassoan/PedicleScrewSimulator/blob/master/PedicleScrewSimulator/PedicleScrewSimulatorWizard/LandmarksStep.py) of this project.We proposed the concept of **the Pedicle Tirangle**, which refers to the three points of the same vertebral body: **the Vertebral Anterior Point (VAP)** and **the Pedicle Isthmus Point(PIP)** of the left and right, formed by  As shown in the figure below: the VAP refers to the anterior midpoint of the vertebral body, and the PIP is based on the largest transverse diameter of the vertebral canal as the coronal plane, and the midpoint of the pedicle on both sides of the plane.  According to these three points, the plug-in forms the axis of the pedicle by connecting the VAP and the lPIP and rPIP, respectively. In addition, we also designs a preliminary estimate of the length and radius of the pedicle screw.
