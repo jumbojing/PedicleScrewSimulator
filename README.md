@@ -1,4 +1,4 @@
-PedicleScrewPlaner
+PedicleScrewPlanner
 =====================
 
 ## About the Pedicle Tirangle
